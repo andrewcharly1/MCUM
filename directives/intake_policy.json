@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "strict_intake": true,
+  "required_fields": [
+    "project_path",
+    "task_type",
+    "objective",
+    "expected_deliverable",
+    "success_criteria",
+    "execution_mode"
+  ],
+  "optional_fields": [
+    "sources_to_review",
+    "constraints",
+    "risk_level",
+    "validation_required"
+  ],
+  "allowed_task_types": [
+    "analizar",
+    "crear",
+    "corregir",
+    "mejorar",
+    "planificar",
+    "validar",
+    "automatizar"
+  ],
+  "allowed_execution_modes": [
+    "analizar",
+    "proponer",
+    "ejecutar"
+  ],
+  "require_user_confirmation": true,
+  "block_if_missing_required_fields": true
+}

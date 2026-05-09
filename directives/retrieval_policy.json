@@ -1,0 +1,48 @@
+{
+    "_meta": {
+        "version": "1.1.0",
+        "description": "Retrieval policy for the MCUM experience store",
+        "editable_by": "sisl_loop",
+        "note": "This policy controls what memory enters the task context"
+    },
+    "limits": {
+        "max_total_experiences": 5,
+        "max_token_budget": 4000,
+        "min_confidence_threshold": 0.30,
+        "never_retrieve_below": 0.15
+    },
+    "slot_allocation": {
+        "top_relevant": 3,
+        "failure_pattern": 1,
+        "active_conflict": 1
+    },
+    "semantic": {
+        "min_similarity": 0.30,
+        "semantic_weight": 0.60,
+        "confidence_weight": 0.40
+    },
+    "filters": {
+        "exclude_superseded": true,
+        "exclude_synthetic_unvalidated": true,
+        "exclude_confidence_below": 0.30
+    },
+    "diversity": {
+        "enforce_category_diversity": true,
+        "max_same_category": 2,
+        "max_same_project": 3,
+        "prefer_multi_context_validated": true
+    },
+    "ranking": {
+        "primary_sort": "current_confidence DESC",
+        "secondary_sort": "revalidation_count DESC",
+        "tertiary_sort": "unique_context_count DESC",
+        "weights": {
+            "confidence": 0.40,
+            "semantic": 0.60
+        }
+    },
+    "cold_start": {
+        "min_experiences_before_warning": 5,
+        "cold_start_message": "System is in cold start. Retrieval context is limited."
+    }
+}

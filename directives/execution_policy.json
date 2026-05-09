@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "strict_mode": true,
+  "min_dispatch_confidence": 0.8,
+  "require_active_session": true,
+  "require_task_brief": true,
+  "require_validation_before_success": true,
+  "require_artifacts_for_success": true,
+  "project_first_retrieval": true,
+  "allow_cross_project_fallback": true,
+  "cross_project_fallback_only_if_no_project_hits": true,
+  "max_cross_project_memories": 1,
+  "max_playbooks": 3,
+  "min_playbook_similarity": 0.28,
+  "autonomous_writeback": "candidate",
+  "autonomous_writeback_targets": [
+    "html-dashboard-expert",
+    "go-industrial-expert",
+    "ui-ux-pro-max"
+  ],
+  "autonomous_writeback_exclude": [],
+  "sisl_mode": "db_only",
+  "skill_factory_mode": "candidate_bootstrap",
+  "skill_factory_min_gap_occurrences": 2,
+  "skill_factory_low_confidence_threshold": 0.72,
+  "skill_factory_max_candidates_per_cycle": 1,
+  "skill_factory_min_active_tests": 8,
+  "skill_factory_min_successful_uses": 2,
+  "skill_factory_min_success_rate": 0.75,
+  "block_on_unconfirmed_brief": true,
+  "block_on_policy_violation": true
+}
