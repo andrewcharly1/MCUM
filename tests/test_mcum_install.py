@@ -26,6 +26,36 @@ def _spec() -> dict:
     }
 
 
+def test_uninstall_embedded_stop_branch_does_not_namerror(tmp_path, monkeypatch) -> None:
+    """Regression: uninstall() referenced subprocess in the embedded-stop branch
+    while subprocess was not imported at module scope -> NameError. The branch is
+    only reached on a real (non-dry-run) embedded install."""
+    workspace = tmp_path / "ws"
+    install = workspace / "MCUM"
+    (install / "db").mkdir(parents=True)
+    (install / "db" / "embedded_pg.mjs").write_text("process.exit(0);\n", encoding="utf-8")
+    pgdata = tmp_path / "pgdata"
+    pgdata.mkdir()
+    (install / ".env").write_text(
+        "MCUM_DB_EMBEDDED=1\n"
+        "DB_PORT=5499\n"
+        f"MCUM_PG_DATA_DIR={pgdata}\n",
+        encoding="utf-8",
+    )
+
+    calls: list[list[str]] = []
+    monkeypatch.setattr(mcum_install.subprocess, "run", lambda cmd, **kw: calls.append(cmd))
+    monkeypatch.setattr(mcum_install.shutil, "which", lambda name: "node")
+    monkeypatch.setattr(mcum_install, "_remove_codex_mcum", lambda: False)
+
+    rc = mcum_install.uninstall(workspace, purge_db=True, dry_run=False)
+
+    assert rc == 0
+    assert calls and calls[0][:1] == ["node"] and calls[0][-1] == "stop"
+    assert not install.exists()  # install folder removed
+    assert not pgdata.exists()  # embedded DB data purged
+
+
 def test_build_server_spec_has_required_shape() -> None:
     spec = mcum_install.build_server_spec(project_name="demo", embedding_backend="onnx")
     assert spec["command"] == "node"

@@ -1,6 +1,6 @@
 {
   "name": "mcum-orchestrator",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "private": false,
   "type": "module",
   "description": "MCUM \u2014 PostgreSQL-native orchestration brain & memory for any MCP agent. One-command installer.",
