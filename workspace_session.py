@@ -48,6 +48,7 @@ from MCUM.core.spec_contract import build_spec_contract, normalize_spec_policy, 
 from MCUM.core.worker_runner import build_worker_runner_invocation, resolve_worker_runner
 from MCUM.core.code_graph_indexer import scan_project_code_graph
 from MCUM.core.code_graph_sync import sync_project_code_graph
+from MCUM.core.code_graph_autoindex import ensure_code_graph
 from MCUM.core.pattern_discovery import auto_promote_ready_candidates, run_pattern_discovery
 from MCUM.core.skill_factory import run_skill_factory_cycle
 from MCUM.anti_loop import analyze_problem_loop, enrich_loop_state_with_strategy, sanitize_loop_state
@@ -4361,6 +4362,23 @@ def _run_code_graph_index(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_ensure_code_graph(args: argparse.Namespace) -> int:
+    project_path = str(Path(getattr(args, "project_path", None) or SKILL_ROOT).resolve())
+    project_name = getattr(args, "project_name", None) or Path(project_path).name
+    payload = ensure_code_graph(
+        project_path,
+        project_name=project_name,
+        task_type=getattr(args, "task_type", None),
+        force=bool(getattr(args, "force", False)),
+        allow_large=bool(getattr(args, "allow_large", False)),
+        check_only=bool(getattr(args, "check_only", False)),
+        run_unified_sync=not bool(getattr(args, "no_unified_sync", False)),
+        max_file_bytes=getattr(args, "max_file_bytes", None),
+    )
+    _safe_print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
+    return 0
+
+
 def _run_code_graph_query(args: argparse.Namespace) -> int:
     project_path = str(Path(getattr(args, "project_path", None) or SKILL_ROOT).resolve())
     project_name = getattr(args, "project_name", None) or Path(project_path).name
@@ -5132,6 +5150,16 @@ def _build_parser() -> argparse.ArgumentParser:
     code_graph_index_parser.add_argument("--exclude-dir", action="append", default=[], help="Directory name or relative path to exclude. Repeatable.")
     code_graph_index_parser.add_argument("--max-file-bytes", type=int, default=None, help="Skip source files larger than this many bytes.")
 
+    ensure_code_graph_parser = subparsers.add_parser("ensure-code-graph", help="Gated freshness check that auto-indexes the code graph only when missing or stale.")
+    ensure_code_graph_parser.add_argument("--project-path", required=True, help="Project path to ensure.")
+    ensure_code_graph_parser.add_argument("--project-name", help="Project name override.")
+    ensure_code_graph_parser.add_argument("--task-type", help="Task type; non-code task types are skipped.")
+    ensure_code_graph_parser.add_argument("--check-only", action="store_true", help="Report freshness only; never index.")
+    ensure_code_graph_parser.add_argument("--force", action="store_true", help="Re-index even when the fingerprint matches.")
+    ensure_code_graph_parser.add_argument("--allow-large", action="store_true", help="Build inline even when a first build is large (no deferral).")
+    ensure_code_graph_parser.add_argument("--no-unified-sync", action="store_true", help="Skip the federated graph projection after indexing.")
+    ensure_code_graph_parser.add_argument("--max-file-bytes", type=int, default=None, help="Skip source files larger than this many bytes.")
+
     code_graph_query_parser = subparsers.add_parser("code-graph-query", help="Query compact context from the native MCUM code_graph.")
     code_graph_query_parser.add_argument("--project-path", required=True, help="Project path registered in MCUM.")
     code_graph_query_parser.add_argument("--project-name", help="Project name override.")
@@ -5334,6 +5362,8 @@ def main() -> int:
         return _run_health(args)
     if args.mode == "code-graph-index":
         return _run_code_graph_index(args)
+    if args.mode == "ensure-code-graph":
+        return _run_ensure_code_graph(args)
     if args.mode == "code-graph-query":
         return _run_code_graph_query(args)
     if args.mode == "graph-sync":

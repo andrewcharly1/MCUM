@@ -541,17 +541,41 @@ async function mcumPrepareFrontendQa(input = {}) {
   return runProcess(args, { cwd: input.project_path || defaultProjectPath, timeoutMs: 180000 });
 }
 
+function autoCodeGraphEnabled() {
+  return !["0", "false", "no", "off"].includes(
+    String(process.env.MCUM_AUTO_CODE_GRAPH || "1").trim().toLowerCase()
+  );
+}
+
 async function mcumPrepareIntake(input = {}) {
   if (!input.task) {
     return { code: 2, stdout: "", stderr: "task is required for non-interactive intake." };
   }
+  const projectPath = input.project_path || defaultProjectPath;
+  const projectName = input.project_name || defaultProjectName;
+  const taskType = input.task_type || "validar";
+  // Kick off the gated code-graph ensure in the background so the graph is
+  // ready (or building) by the time deep analysis starts, without blocking
+  // intake. For an explicit/blocking result, call mcum_ensure_code_graph.
+  let codeGraphAdvisory;
+  if (autoCodeGraphEnabled() && input.auto_code_graph !== false) {
+    const launched = fireBackgroundEnsureCodeGraph(projectPath, projectName, taskType);
+    codeGraphAdvisory = {
+      auto_ensure_started: launched,
+      note: launched
+        ? "Background code-graph ensure started (incremental; large first builds are deferred). Call mcum_ensure_code_graph before deep code analysis to confirm it is fresh, or mcum_graph_health to inspect it."
+        : "Could not start background code-graph ensure; call mcum_ensure_code_graph manually if this task analyzes source.",
+      disable_with: "set MCUM_AUTO_CODE_GRAPH=0 or pass auto_code_graph=false"
+    };
+  }
   return {
     code: 0,
     stdout: JSON.stringify({
-      project_path: input.project_path || defaultProjectPath,
-      project_name: input.project_name || defaultProjectName,
+      project_path: projectPath,
+      project_name: projectName,
       task: input.task,
-      task_type: input.task_type || "validar",
+      task_type: taskType,
+      code_graph_advisory: codeGraphAdvisory,
       objective: input.objective || input.task,
       expected_deliverable: input.expected_deliverable || "Brief normalizado para MCUM.",
       success_criteria: input.success_criteria || "La tarea queda descrita sin solicitar input interactivo.",
@@ -654,6 +678,57 @@ async function mcumCodeGraphIndex(input = {}) {
     addIfValue(args, "--exclude-dir", value);
   }
   return runProcess(args, { cwd: projectPath, timeoutMs: Number(input.timeout_seconds || 300) * 1000 });
+}
+
+async function mcumEnsureCodeGraph(input = {}) {
+  const projectPath = input.project_path || defaultProjectPath;
+  const args = [
+    workspaceSession,
+    "ensure-code-graph",
+    "--project-path",
+    projectPath,
+    "--project-name",
+    input.project_name || defaultProjectName
+  ];
+  addIfValue(args, "--task-type", input.task_type);
+  if (input.check_only) args.push("--check-only");
+  if (input.force) args.push("--force");
+  if (input.allow_large) args.push("--allow-large");
+  if (input.no_unified_sync) args.push("--no-unified-sync");
+  if (input.max_file_bytes !== undefined) {
+    args.push("--max-file-bytes", String(boundedInt(input.max_file_bytes, 1000000, 1024, 10000000)));
+  }
+  return runProcess(args, { cwd: projectPath, timeoutMs: Number(input.timeout_seconds || 300) * 1000 });
+}
+
+// Fire-and-forget: launch the gated ensure in a detached, hidden process so
+// prepare_intake stays instant and never blocks on a first-time scan. The CLI
+// itself decides (fresh -> no-op, stale -> incremental, large first build ->
+// deferred), so this is safe to call on every intake.
+function fireBackgroundEnsureCodeGraph(projectPath, projectName, taskType) {
+  try {
+    const args = [
+      ...pythonArgs,
+      workspaceSession,
+      "ensure-code-graph",
+      "--project-path",
+      projectPath,
+      "--project-name",
+      projectName
+    ];
+    if (taskType) args.push("--task-type", String(taskType));
+    const child = spawn(pythonExe, args, {
+      cwd: projectPath,
+      env: { ...process.env, PYTHONIOENCODING: "utf-8", ...embeddingEnv() },
+      detached: true,
+      stdio: "ignore",
+      windowsHide: true
+    });
+    child.unref();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function mcumCodeGraphQuery(input = {}) {
@@ -1106,6 +1181,24 @@ const tools = [
     }
   },
   {
+    name: "mcum_ensure_code_graph",
+    description: `${antigravityExecutionPolicy} Gated freshness gate for the code graph: cheaply checks whether the project graph is missing or stale and incrementally indexes it only when needed. Call this before code analysis on a repository you have not indexed yet. A large first build is deferred with a recommendation instead of blocking; pass force or allow_large to override. mcum_prepare_intake already kicks this off in the background automatically.`,
+    inputSchema: {
+      type: "object",
+      properties: {
+        project_path: { type: "string" },
+        project_name: { type: "string" },
+        task_type: { type: "string" },
+        check_only: { type: "boolean", description: "Report freshness only; never index." },
+        force: { type: "boolean", description: "Re-index even when the fingerprint matches." },
+        allow_large: { type: "boolean", description: "Index inline even when a first build is large." },
+        no_unified_sync: { type: "boolean", description: "Skip the federated graph projection after indexing." },
+        max_file_bytes: { type: "integer" },
+        timeout_seconds: { type: "integer" }
+      }
+    }
+  },
+  {
     name: "mcum_code_graph_query",
     description: `${antigravityExecutionPolicy} Query MCUM native code_graph for compact code locations before asking a worker to inspect source files.`,
     inputSchema: {
@@ -1439,6 +1532,7 @@ const handlers = {
   mcum_generate_multi_plan: mcumGenerateMultiPlan,
   mcum_delegate_worker_task: mcumDelegateWorkerTask,
   mcum_code_graph_index: mcumCodeGraphIndex,
+  mcum_ensure_code_graph: mcumEnsureCodeGraph,
   mcum_code_graph_query: mcumCodeGraphQuery,
   mcum_graph_sync: mcumGraphSync,
   mcum_graph_query: mcumGraphQuery,

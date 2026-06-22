@@ -47,6 +47,13 @@ start, retrieval, logging, artifacts, and session end.
 
 - The coordinator synchronizes `code_graph` at session begin and session close. Worker
   sessions defer synchronization to the coordinator to avoid duplicate scans and writes.
+- Automatic freshness gate: `mcum_prepare_intake` starts a gated, non-blocking
+  `mcum_ensure_code_graph` in the background so an unindexed or stale repository is brought
+  up to date before deep analysis. The gate is cheap (git/stat fingerprint), indexes only
+  when missing or changed, and defers an oversized first build with a recommendation instead
+  of blocking. For a code-analysis task on a repository you have not indexed yet, call
+  `mcum_ensure_code_graph` explicitly (or `mcum_graph_health`) to confirm the graph is fresh
+  before reading source. Disable the auto-trigger with `MCUM_AUTO_CODE_GRAPH=0`.
 - Every explicit `project_path` is an isolated MCUM project. Never merge sibling folders
   under `the workspace` into one graph unless the user explicitly selects their
   common parent as the project path.
