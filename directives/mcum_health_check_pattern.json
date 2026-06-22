@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "rule_text": "PostgreSQL psql encoding rules: never use accents, ennes, or special characters in comments or string patterns inside psql -c queries. Always verify columns via information_schema.columns before querying. core_brain is a schema not a table.",
+  "context": "MCUM health check via psql commands: encoding errors 0xfa/0xf1/0xed, wrong column names, parallel call cancellations",
+  "conclusion": "Use ASCII-only SQL, sequential psql execution, pg_isready before query, always schema.table format",
+  "fix": "pg_isready -h localhost -p 5432 first, then psql with fully qualified names",
+  "errors_observed": [
+    "secuencia de bytes no valida para codificacion UTF8: 0xfa",
+    "secuencia de bytes no valida para codificacion UTF8: 0xf1 0x6f 0x2f 0x64",
+    "secuencia de bytes no valida para codificacion UTF8: 0xed 0x63 0x75",
+    "no existe la columna skill_version",
+    "canceled parallel tool call"
+  ],
+  "prevention_rules": [
+    "No accents in psql comments or string patterns",
+    "No ennes in SQL queries",
+    "Always check information_schema.columns first",
+    "Sequential execution when uncertain",
+    "core_brain.schema is SCHEMA not TABLE"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Governed limits for graph extraction, querying, analytics, exports, and local dashboard operations.",
+    "editable_by": "manual_only"
+  },
+  "features": {
+    "tree_sitter": true,
+    "multimedia": true,
+    "analytics": true,
+    "impact": true,
+    "exports": true,
+    "comparison": true,
+    "cross_project": true,
+    "dashboard": true
+  },
+  "priority_languages": [
+    "python",
+    "javascript",
+    "typescript",
+    "go",
+    "sql",
+    "html",
+    "css"
+  ],
+  "query": {
+    "default_depth": 1,
+    "max_depth": 3,
+    "default_page_size": 25,
+    "max_page_size": 100,
+    "max_nodes": 250,
+    "max_edges_per_node": 100,
+    "max_evidence_items": 100
+  },
+  "budgets": {
+    "multimedia": {
+      "max_file_bytes": 26214400,
+      "max_ocr_pages": 50,
+      "max_video_seconds": 600
+    },
+    "analytics": {
+      "max_nodes": 10000,
+      "max_runtime_seconds": 60
+    },
+    "impact": {
+      "max_depth": 4,
+      "max_nodes": 1000
+    },
+    "exports": {
+      "max_nodes": 5000,
+      "max_bytes": 52428800
+    },
+    "cross_project": {
+      "max_projects": 1,
+      "max_nodes_per_project": 500
+    },
+    "dashboard": {
+      "max_rows": 1000,
+      "min_refresh_seconds": 10
+    }
+  }
+}

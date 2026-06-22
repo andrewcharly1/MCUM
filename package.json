@@ -1,0 +1,29 @@
+{
+  "name": "mcum-orchestrator",
+  "version": "1.2.0",
+  "private": false,
+  "type": "module",
+  "description": "MCUM \u2014 PostgreSQL-native orchestration brain & memory for any MCP agent. One-command installer.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andrewcharly1/MCUM.git"
+  },
+  "bin": {
+    "mcum": "bin/mcum.mjs"
+  },
+  "scripts": {
+    "setup": "node bin/mcum.mjs init",
+    "doctor": "node bin/mcum.mjs doctor",
+    "register": "node bin/mcum.mjs register --auto",
+    "db:start": "node db/embedded_pg.mjs start",
+    "db:stop": "node db/embedded_pg.mjs stop",
+    "db:status": "node db/embedded_pg.mjs status"
+  },
+  "optionalDependencies": {
+    "embedded-postgres": "^18.4.0-beta.17"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

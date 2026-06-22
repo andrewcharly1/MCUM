@@ -1,0 +1,46 @@
+# MCUM bundled stack — PostgreSQL + pgvector (and optional PostgREST).
+# This packages "everything from PostgreSQL": one `docker compose up -d` gives a
+# ready MCUM database with the full schema and pgvector installed. The MCP server
+# itself is stdio and is launched per-session by each agent (see INSTALL.md);
+# point it at this DB via DATABASE_URL / DB_* env.
+#
+#   docker compose up -d            # start DB (+ auto-applies schema.sql on first init)
+#   docker compose --profile api up -d   # also start PostgREST on :3000
+#
+services:
+  mcum-db:
+    image: pgvector/pgvector:pg16        # PostgreSQL 16 with pgvector precompiled
+    container_name: mcum-db
+    environment:
+      POSTGRES_USER: ${MCUM_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${MCUM_DB_PASSWORD:-admin1234}
+      POSTGRES_DB: ${MCUM_DB_NAME:-postgres}
+    ports:
+      - "${MCUM_DB_PORT:-5432}:5432"
+    volumes:
+      - mcum_pgdata:/var/lib/postgresql/data
+      # schema.sql is idempotent and self-orders; runs once on an empty data dir.
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/10_mcum_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MCUM_DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional REST surface over MCUM's PostgreSQL (enable with: --profile api).
+  mcum-rest:
+    image: postgrest/postgrest:latest
+    container_name: mcum-rest
+    profiles: ["api"]
+    depends_on:
+      mcum-db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://${MCUM_DB_USER:-postgres}:${MCUM_DB_PASSWORD:-admin1234}@mcum-db:5432/${MCUM_DB_NAME:-postgres}
+      PGRST_DB_SCHEMAS: core_brain,project_registry,mcum_graph
+      PGRST_DB_ANON_ROLE: ${MCUM_DB_USER:-postgres}
+    ports:
+      - "${MCUM_REST_PORT:-3000}:3000"
+
+volumes:
+  mcum_pgdata:

@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "version": "2.0.0",
+    "description": "Governed Pattern Intelligence policy. Discovery may stage candidates, but only explicit human review may materialize drafts.",
+    "editable_by": "manual_only"
+  },
+  "mode": "shadow",
+  "auto_promote": true,
+  "embedding": {
+    "backend": "sentence-transformers",
+    "model_name": "all-MiniLM-L6-v2",
+    "dimension": 384,
+    "batch_size": 32,
+    "require_semantic_model": true
+  },
+  "eligibility": {
+    "included_categories": [
+      "architecture_pattern",
+      "implementation_recipe",
+      "testing_strategy",
+      "prompting_heuristic",
+      "failure_pattern",
+      "evaluation_policy",
+      "stack_decision"
+    ],
+    "excluded_categories": [
+      "regulatory_rule"
+    ],
+    "exclude_synthetic": true,
+    "min_confidence": 0.55,
+    "max_experiences_per_run": 1000
+  },
+  "clustering": {
+    "algorithm_version": "semantic-components-v2",
+    "pair_similarity_threshold": 0.82,
+    "centroid_similarity_threshold": 0.78,
+    "max_group_size": 250,
+    "max_cluster_size": 30
+  },
+  "quality_gates": {
+    "min_support": 3,
+    "min_context_diversity": 2,
+    "min_distinct_projects_global": 2,
+    "min_distinct_skills_global": 2,
+    "min_distinct_contexts_global": 3,
+    "project_diversity_mode": "projects_or_contexts",
+    "min_cohesion": 0.8,
+    "min_avg_confidence": 0.75,
+    "max_open_conflicts": 0,
+    "review_score": 0.78
+  },
+  "lifecycle": {
+    "candidate_ttl_days": 90,
+    "min_usage_before_health_decision": 5,
+    "degraded_success_rate": 0.5,
+    "manual_accept_to_status": "draft"
+  },
+  "maintenance": {
+    "enabled": true,
+    "action": "analyze_pattern_candidates"
+  }
+}

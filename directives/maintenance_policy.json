@@ -1,0 +1,140 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Policy for delta-driven MCUM maintenance cycles",
+    "editable_by": "manual_or_automation",
+    "note": "Run cheap DB preflight first and only spend tokens when there is fresh signal or stale metrics."
+  },
+  "maintenance_name": "daily_guard",
+  "min_hours_between_runs": 20,
+  "delta_window_hours": 24,
+  "refresh_daily_metrics": true,
+  "snapshot_window_days": 14,
+  "skip_if_no_new_logs": true,
+  "operational_closure": {
+    "stale_maintenance_minutes": 30,
+    "probe_local_connectors": true
+  },
+  "token_targets": {
+    "max_recent_context_tokens_in": 950,
+    "max_recent_context_tokens_out": 220
+  },
+  "latency_targets": {
+    "max_recent_retrieval_p90_ms": 15000,
+    "max_recent_task_p90_ms": 45000
+  },
+  "quality_targets": {
+    "min_recent_success_rate": 0.75,
+    "max_partial_missing_artifacts": 1
+  },
+  "catalog_targets": {
+    "max_candidate_active_ratio": 3.0
+  },
+  "memory_targets": {
+    "max_experience_duplicate_ratio": 0.18,
+    "max_exact_duplicate_ratio": 0.01,
+    "max_experience_verbose_ratio": 0.22,
+    "max_low_validation_experience_ratio": 0.35,
+    "max_playbook_never_reused_ratio": 0.45,
+    "max_playbook_verbose_ratio": 0.20,
+    "min_playbook_compact_ratio": 0.40
+  },
+  "pattern_intelligence": {
+    "enabled": true,
+    "run_on_new_tasks": true,
+    "report_activation_backlog": true,
+    "activation_backlog_limit": 20,
+    "activation_backlog_max_age_days": 90
+  },
+  "self_heal": {
+    "enabled": true,
+    "max_actions_per_run": 3,
+    "safe_actions": [
+      "refresh_daily_metrics",
+      "snapshot_project_kpis",
+      "audit_memory_governance",
+      "consolidate_duplicate_experiences",
+      "analyze_pattern_candidates"
+    ],
+    "force_executes_safe_actions": true,
+    "adaptive_actions": [
+      "run_skill_factory",
+      "tune_anti_loop_dispatch_bias",
+      "tune_memory_governor"
+    ],
+    "repeat_required_for_adaptive_actions": true,
+    "manual_review_triggers": [
+      "critical_error",
+      "schema_drift",
+      "unexpected_exception",
+      "policy_violation"
+    ],
+    "continue_on_action_error": true,
+    "halt_on_manual_review": true,
+    "rollback_on_action_failure": true
+  },
+  "skill_factory": {
+    "enabled": true,
+    "lookback_days": 30,
+    "min_occurrences": 2,
+    "low_confidence_threshold": 0.72,
+    "max_candidates": 1,
+    "max_pending_results": 12,
+    "max_monitoring_results": 5,
+    "max_candidate_ratio_for_bootstrap": 3.0,
+    "enable_candidate_family_consolidation": true,
+    "min_active_tests": 8,
+    "min_successful_uses": 2,
+    "min_success_rate": 0.75,
+    "min_lifecycle_score": 0.78,
+    "min_testing_uses": 2,
+    "activation_score": 0.82,
+    "rollback_score": 0.55
+  },
+  "anti_loop_dispatch_tuning": {
+    "enabled": true,
+    "lookback_days": 21,
+    "history_lookback_days": 30,
+    "history_limit": 6,
+    "min_hinted_tasks": 6,
+    "min_preferred_selected": 2,
+    "target_success_rate": 0.82,
+    "low_success_rate": 0.55,
+    "success_margin": 0.08,
+    "target_preferred_selection_rate": 0.45,
+    "low_preferred_selection_rate": 0.20,
+    "min_hours_between_adjustments": 24,
+    "reversal_cooldown_hours": 72,
+    "score_step": 0.01,
+    "priority_step": 0.1,
+    "min_score_boost": 0.04,
+    "max_score_boost": 0.14,
+    "min_priority_boost": 0.2,
+    "max_priority_boost": 1.0
+  },
+  "memory_governor_tuning": {
+    "enabled": true,
+    "lookback_days": 21,
+    "history_lookback_days": 30,
+    "history_limit": 6,
+    "min_tasks": 6,
+    "high_contamination_threshold": 0.45,
+    "low_contamination_threshold": 0.22,
+    "target_success_rate_tighten": 0.78,
+    "low_success_rate_relax": 0.65,
+    "target_avg_context_tokens_in": 980,
+    "high_local_filter_activation_rate": 0.18,
+    "high_filtered_items_per_task": 0.45,
+    "min_hours_between_adjustments": 24,
+    "reversal_cooldown_hours": 72,
+    "step_assist_penalty_weight": 0.01,
+    "step_cross_project_risk": 0.01,
+    "step_verbosity_soft_cap": 40,
+    "min_assist_penalty_weight": 0.08,
+    "max_assist_penalty_weight": 0.22,
+    "min_cross_project_risk": 0.03,
+    "max_cross_project_risk": 0.14,
+    "min_verbosity_soft_cap": 520,
+    "max_verbosity_soft_cap": 920
+  }
+}

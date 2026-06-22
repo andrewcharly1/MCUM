@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "scope": "controlled_mcum_integration",
+  "description": "Policy for consulting the governed methodology library from the live MCUM runtime without contaminating operational memory.",
+  "isolation": {
+    "library_only_mode": true,
+    "attach_to_active_mcum": true,
+    "write_to_core_brain": false,
+    "write_to_project_registry": false,
+    "promote_doctrine_directly_to_experience": false,
+    "shadow_mode_required_before_activation": true
+  },
+  "retrieval": {
+    "default_mode": "summary_first",
+    "allowed_modes": [
+      "summary_first",
+      "section_then_chunk",
+      "chunk_only",
+      "deep_read",
+      "full_document"
+    ],
+    "max_results": 5,
+    "max_sections_per_document": 3,
+    "max_chunks_per_section": 4,
+    "max_citations_per_answer": 8,
+    "token_budget": {
+      "summary_only": 600,
+      "section_then_chunk": 1400,
+      "deep_read": 2400,
+      "full_document": 5000
+    }
+  },
+  "citation": {
+    "required": true,
+    "require_document_id": true,
+    "require_section_ref": true,
+    "require_page_ref": true,
+    "require_chunk_ref": true,
+    "require_quote_or_paraphrase_trace": true,
+    "no_uncited_governance_claims": true,
+    "precision_citation_mode": true,
+    "minimum_citations_for_cross_source_claim": 2
+  },
+  "quality": {
+    "prefer_canonical_sources": true,
+    "prefer_project_local_sources": true,
+    "prefer_recent_revision_when_available": true,
+    "reject_unclear_source_provenance": true,
+    "reject_low_confidence_extractions": true,
+    "minimum_extraction_confidence": 0.72,
+    "minimum_retrieval_confidence": 0.55,
+    "require_human_review_for_ambiguous_ocr": true
+  },
+  "anti_hallucination": {
+    "no_synthesis_without_evidence": true,
+    "no_summary_without_backreferences": true,
+    "no_policy_change_from_single_chunk": true,
+    "conflict_requires_explicit_comparison": true,
+    "fallback_to_clarifying_question_when_insufficient": true,
+    "full_read_only_on_demand": true
+  },
+  "allowed_execution_modes": [
+    "analizar",
+    "proponer",
+    "validar",
+    "ejecutar"
+  ]
+}

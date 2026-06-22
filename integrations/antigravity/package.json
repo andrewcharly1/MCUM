@@ -1,0 +1,10 @@
+{
+  "name": "mcum-antigravity-local-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local MCP stdio bridge that exposes workspace MCUM to Google Antigravity.",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0"
+  }
+}

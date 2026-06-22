@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "library_mode": "controlled_shadow",
+  "default_phase": "activation",
+  "flags": {
+    "knowledge_library_enabled": true,
+    "document_ingestion_enabled": false,
+    "ocr_fallback_enabled": false,
+    "native_text_extraction_enabled": false,
+    "summary_index_enabled": true,
+    "section_index_enabled": true,
+    "chunk_index_enabled": true,
+    "semantic_index_enabled": true,
+    "citation_enforcement_enabled": true,
+    "summary_first_retrieval_enabled": true,
+    "deep_read_enabled": false,
+    "full_document_read_enabled": false,
+    "shadow_mode_enabled": false,
+    "mcum_orchestrator_cable_enabled": true,
+    "mcum_dispatch_hook_enabled": false,
+    "experience_writeback_enabled": false,
+    "playbook_writeback_enabled": false,
+    "pattern_writeback_enabled": false,
+    "promotion_pipeline_enabled": false
+  },
+  "rollout": {
+    "phase_0_scaffold": true,
+    "phase_1_ingestion": true,
+    "phase_2_retrieval": true,
+    "phase_3_shadow_integration": true,
+    "phase_4_activation": true
+  },
+  "budget": {
+    "summary_first_max_tokens": 600,
+    "section_then_chunk_max_tokens": 1400,
+    "deep_read_max_tokens": 2400,
+    "full_document_max_tokens": 5000,
+    "max_citations_per_answer": 8
+  },
+  "guardrails": {
+    "block_uncited_governance_claims": true,
+    "block_single_source_policy_changes": true,
+    "block_low_confidence_ocr_promotion": true,
+    "block_writeback_without_validation": true,
+    "block_runtime_integration_without_approval": true
+  }
+}

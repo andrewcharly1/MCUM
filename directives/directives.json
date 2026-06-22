@@ -1,0 +1,65 @@
+{
+    "_meta": {
+        "version": "1.1.0",
+        "description": "Operational directives for the MCUM repository",
+        "editable_by": "mcum-orchestrator",
+        "immutable_by": "sisl_loop",
+        "last_updated": "2026-03-11",
+        "updated_by": "codex"
+    },
+    "orchestrator": {
+        "activation_mode": "mandatory_workspace",
+        "note": "MCUM is the mandatory outer orchestration layer for all tasks in this workspace.",
+        "session_logging": true,
+        "auto_register_project": true,
+        "min_task_description_length": 10,
+        "log_all_tasks": true,
+        "log_decisions": true,
+        "log_improvements": true
+    },
+    "skill_selection": {
+        "strategy": "best_match",
+        "fallback": "kaizen",
+        "max_skills_per_task": 3,
+        "conflict_resolution": "ask_user",
+        "unknown_domain": "use_kaizen_then_escalate",
+        "skill_registry_path": "../core/dispatcher.py"
+    },
+    "experience_management": {
+        "auto_generate_on_task_complete": true,
+        "min_confidence_to_save": 0.60,
+        "min_confidence_to_retrieve": 0.30,
+        "confidence_decay_interval_days": 30,
+        "confidence_decay_rate": 0.02,
+        "max_experiences_per_task": 3
+    },
+    "pattern_promotion": {
+        "min_experiences_required": 3,
+        "min_avg_confidence": 0.75,
+        "min_context_diversity": 2,
+        "max_open_conflicts": 0,
+        "promotion_is_automatic": true
+    },
+    "session_management": {
+        "log_session_start": true,
+        "log_session_end": true,
+        "track_project_by_path": true,
+        "auto_detect_tech_stack": false,
+        "note": "Tech stack remains manually curated."
+    },
+    "poka_yoke": {
+        "fail_fast_on_db_error": true,
+        "rollback_on_schema_error": true,
+        "validate_inputs": true,
+        "check_confidence_before_retrieve": true,
+        "never_retrieve_superseded": true,
+        "never_retrieve_synthetic_unvalidated": true
+    },
+    "kaizen_loop": {
+        "enabled": false,
+        "note": "Keep disabled until the retrieval and logging core is stable.",
+        "max_iterations_without_improvement": 5,
+        "min_ckl_score_target": 0.90,
+        "auto_apply_improvements_under_level": 2
+    }
+}

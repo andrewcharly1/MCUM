@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>MCUM Control</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">M</span>
+        <div>
+          <strong>MCUM</strong>
+          <span>Control local</span>
+        </div>
+      </div>
+      <nav class="tabs" aria-label="Vistas">
+        <button class="tab active" data-tab="summary">
+          <span class="tab-icon">01</span><span>Resumen</span>
+        </button>
+        <button class="tab" data-tab="connectors">
+          <span class="tab-icon">02</span><span>Conectores</span>
+        </button>
+        <button class="tab" data-tab="agents">
+          <span class="tab-icon">03</span><span>Agentes</span>
+        </button>
+        <button class="tab" data-tab="graph">
+          <span class="tab-icon">04</span><span>Grafo</span>
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="live-dot"></span>
+        <span>Solo lectura</span>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Operacion</p>
+          <h1 id="view-title">Resumen</h1>
+        </div>
+        <div class="topbar-actions">
+          <span id="updated-at" class="updated-at">Sin datos</span>
+          <button id="refresh" class="icon-button" title="Actualizar" aria-label="Actualizar">
+            <span aria-hidden="true">&#8635;</span>
+          </button>
+        </div>
+      </header>
+
+      <div id="error-banner" class="error-banner" hidden></div>
+
+      <section id="view-summary" class="view active" aria-labelledby="view-title">
+        <div id="summary-stats" class="stat-grid"></div>
+        <div class="split-layout">
+          <section class="panel">
+            <div class="section-head">
+              <h2>Estado de conectores</h2>
+              <span id="connector-total" class="count">0</span>
+            </div>
+            <div id="status-bars" class="status-bars"></div>
+          </section>
+          <section class="panel">
+            <div class="section-head">
+              <h2>Alertas</h2>
+              <span id="alert-total" class="count">0</span>
+            </div>
+            <div id="alerts" class="alert-list"></div>
+          </section>
+        </div>
+        <section class="table-section">
+          <div class="section-head">
+            <h2>Actividad reciente</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Agente</th><th>Rol</th><th>Proyecto</th><th>Estado</th><th>Duracion</th><th>Actividad</th></tr>
+              </thead>
+              <tbody id="recent-agents"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-connectors" class="view">
+        <div class="toolbar">
+          <label class="search">
+            <span aria-hidden="true">&#8981;</span>
+            <input id="connector-search" type="search" placeholder="Filtrar conectores">
+          </label>
+          <select id="connector-status" aria-label="Filtrar por estado">
+            <option value="">Todos los estados</option>
+            <option value="connected">Connected</option>
+            <option value="configured">Configured</option>
+            <option value="degraded">Degraded</option>
+            <option value="failed">Failed</option>
+            <option value="disabled">Disabled</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <section class="table-section">
+          <div class="section-head">
+            <h2>Conectores</h2>
+            <span id="connector-filter-count" class="count">0</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Conector</th><th>Tipo</th><th>Estado</th><th>Ultima actividad</th><th>Latencia</th><th>Detalle</th></tr>
+              </thead>
+              <tbody id="connectors-table"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-agents" class="view">
+        <div class="toolbar">
+          <label class="search">
+            <span aria-hidden="true">&#8981;</span>
+            <input id="agent-search" type="search" placeholder="Filtrar agentes">
+          </label>
+          <select id="agent-status" aria-label="Filtrar por estado">
+            <option value="">Todos los estados</option>
+            <option value="connected">Connected</option>
+            <option value="configured">Configured</option>
+            <option value="degraded">Degraded</option>
+            <option value="failed">Failed</option>
+            <option value="disabled">Disabled</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <section class="table-section">
+          <div class="section-head">
+            <h2>Agentes y workers</h2>
+            <span id="agent-filter-count" class="count">0</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Agente</th><th>Modelo</th><th>Proyecto / tarea</th><th>Estado</th><th>Duracion</th><th>Tokens</th><th>Costo</th></tr>
+              </thead>
+              <tbody id="agents-table"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-graph" class="view">
+        <div id="graph-stats" class="stat-grid"></div>
+        <div class="split-layout graph-layout">
+          <section class="panel">
+            <div class="section-head">
+              <h2>Sincronizacion</h2>
+              <span id="graph-status"></span>
+            </div>
+            <dl id="graph-details" class="detail-list"></dl>
+          </section>
+          <section class="panel">
+            <div class="section-head">
+              <h2>Cobertura</h2>
+            </div>
+            <div id="graph-coverage" class="coverage-list"></div>
+          </section>
+        </div>
+        <section class="table-section">
+          <div class="section-head">
+            <h2>Errores recientes</h2>
+            <span id="graph-error-count" class="count">0</span>
+          </div>
+          <div id="graph-errors" class="error-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

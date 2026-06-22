@@ -1,0 +1,17 @@
+# MCUM dependencies
+# Install with: pip install -r requirements.txt
+
+psycopg[binary]>=3.1.0
+psycopg_pool>=3.1.0
+python-dotenv>=1.0.0
+pgvector>=0.3.0
+pytest>=7.4.0
+openpyxl>=3.1.0
+
+# Embeddings backend (default: onnx). fastembed brings ONNX Runtime: ~2-3s cold
+# load, ~220MB RAM, same all-MiniLM-L6-v2 vectors as sentence-transformers.
+fastembed>=0.8.0
+
+# Optional heavier backend (MCUM_EMBEDDING_BACKEND=sentence-transformers): same
+# vectors, ~15-50s cold load, ~440MB RAM. Install only if you need it.
+# sentence-transformers>=3.0.0

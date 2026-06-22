@@ -1,0 +1,10 @@
+# Optional native graph intelligence dependencies.
+# Install after the base requirements when Tree-sitter, Leiden and PDF extraction are enabled.
+tree-sitter>=0.24.0
+tree-sitter-language-pack>=0.8.0
+networkx>=3.2
+python-igraph>=0.11.0
+leidenalg>=0.10.0
+pypdf>=5.0.0
+pillow>=10.0.0
+opencv-python-headless>=4.10.0

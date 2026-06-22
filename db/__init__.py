@@ -1,0 +1,88 @@
+"""
+Database helpers exported by MCUM.
+"""
+
+from .connection import get_connection, get_cursor, get_db, health_check, shutdown_pool
+from .embedder import build_experience_text, cosine_similarity, embed, embed_batch, rank_by_similarity
+from .experience_store import (
+    adjust_confidence,
+    add_conflict,
+    compute_and_store_missing_embeddings,
+    finalize_retrieval_run,
+    get_failure_patterns,
+    record_retrieval_run,
+    retrieve_for_task,
+    save_experience,
+    search_by_keywords,
+    semantic_search,
+    update_confidence,
+)
+from .project_registry import (
+    estimate_tokens,
+    get_or_create_project,
+    get_project_by_path,
+    get_project_logs,
+    get_recent_logs,
+    list_projects,
+    log_entry,
+    log_session_end,
+    log_session_start,
+    normalize_project_path,
+    update_project_info,
+)
+from .session_playbooks import retrieve_session_playbooks, save_session_playbook
+from .skill_catalog import (
+    discover_local_skills,
+    get_skill_record,
+    list_skill_catalog,
+    merge_skill_metadata,
+    mark_skill_used,
+    sync_skill_catalog,
+    update_skill_status,
+    upsert_skill_record,
+)
+
+__all__ = [
+    "get_connection",
+    "get_cursor",
+    "get_db",
+    "health_check",
+    "shutdown_pool",
+    "build_experience_text",
+    "cosine_similarity",
+    "embed",
+    "embed_batch",
+    "rank_by_similarity",
+    "adjust_confidence",
+    "add_conflict",
+    "compute_and_store_missing_embeddings",
+    "finalize_retrieval_run",
+    "get_failure_patterns",
+    "record_retrieval_run",
+    "retrieve_for_task",
+    "save_experience",
+    "save_session_playbook",
+    "search_by_keywords",
+    "semantic_search",
+    "update_confidence",
+    "retrieve_session_playbooks",
+    "discover_local_skills",
+    "get_skill_record",
+    "get_or_create_project",
+    "get_project_by_path",
+    "get_project_logs",
+    "get_recent_logs",
+    "list_projects",
+    "list_skill_catalog",
+    "log_entry",
+    "log_session_end",
+    "log_session_start",
+    "merge_skill_metadata",
+    "mark_skill_used",
+    "normalize_project_path",
+    "estimate_tokens",
+    "sync_skill_catalog",
+    "update_skill_status",
+    "update_project_info",
+    "upsert_skill_record",
+]
